@@ -40,6 +40,8 @@
   <img src="images/get_IMDB_data.jpg">
   <p>We stored the list of top 250 movies from the imdb database in a dictionary using the movie ids as keys and the movie titles as values. We then used the movie ids to query the imdb database for the full information about each movie in the top 250 movies. This database call gave us the cast of each of the movies. Many movies have very large casts, so we only used the first 10 cast members in the list. We queried the database for the filmography of each actor / actress, or the list of all the movies they have been in. We then built a redis database, setting the actor / actress’s id as the key and setting the value to a tuple consisting of their name and filmography. We chose to use ids as keys because we wanted to be confident that we were using a unique identifier even if the actors / actresses had the same name.</p>
 
+  <p> The code for getting each actor and their entire filmography into redis can be found here: <a style="color:green" href="https://github.com/skchandra/redis_db/blob/gh-pages/sprint1_usingredis.ipynb">Sprint 1 Version of Data Wrangling</a></p>
+
 <h3>Our Redis Knowledge</h3>
   <ul>
     <li>We all read <a href="http://openmymind.net/2011/11/8/Redis-Zero-To-Master-In-30-Minutes-Part-1/">Redis Zero to Master in 30 Minutes Part 1</a></li>
@@ -62,6 +64,17 @@
     <li>Once we have the graph data structure in Redis, we will create a new database with it in order to be able to traverse through actors/actresses and movies to find connections between them. We decided that it would be easiest to start by instituting Kevin Bacon as the starting point of our graph and creating our version of the Oracle of Bacon.</li>
     <li>After we have a working implementation for the Bacon Number, we will develop a more general search algorithm which can be applied to search between any two actors/actresses and return the connection between them. Because this is a more broad problem and we are interested in learning more about search algorithms, we will look at depth first search, breadth first search, and bidirectional search in order to be able to see the pros and cons of each.</li>  
 
+<h2>Sprint 2</h2>
+
+<h3> Re-Evaluated Project Steps:</h3>
+
+<p>Coming into sprint 2, we had to re-evaluate our project goals and steps, in order to achieve what we want to learn more efficiently. While we were planning out algorithms and data structures we could use for creating graph/searching. As a result, we scrapped our original idea of using each actor's entire filmography and instead just looked at actors and their films that are in the top 250 movies. <br>
+<ul>Steps we are now doing: 
+<li>Create a dictionary of each top 250 movie as a key, and the top 10 actors for each movie as the corresponding value.</li>
+<li>Use the dictionary to make adjacency lists of each actor and all of the actors that share the same filmography in the top 250 movies list</li>
+<li>Use bi-directional breadth-first search to our adjacency lists to find shortest path between two actors</li>
+</ul>
+</p>
 
 <h2>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
