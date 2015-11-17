@@ -30,11 +30,12 @@ for i in range(10):
 		movies = [k for k in name['actress']]
 	else:
 		pass
-	r_server.set(i, movies)
+	r_server.set(name, movies)
 
 keys = r_server.keys()
 for i, v in enumerate(keys):
-	print r_server.get(v)
+	print v,r_server.get(v)
+	print ""
 
 # for person in ia.search_person('Natalie Portman'):
 #     print person.personID, person['name']
