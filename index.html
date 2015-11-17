@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Redis and IMDB Graphs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Redis and IMDB Graphs</h1>
+        <p class="header"></p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/skchandra/redis_db/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/skchandra/redis_db/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/skchandra/redis_db">View On GitHub</a></li>
+        </ul>
+
+      </header>
+      <section>
+        <h3>
+
+<h2>Project Goals</h2>
+  <p>Our team goals are to learn about database implementation and data structures for Project 2. Utilizing the IMDb database, we are replicating the Oracle of Bacon using Redis and IMDb’s Top 250 Movies’ Actors. With Redis, we want to be able to make our own graphs, data structures and functions into Redis. After using Redis, we want to go one more step back and learn how to implement a database system like Redis.
+  </p>
+
+<h2>Sprint 1</h2>
+
+<h3>IMDB Data Collection</h3>
+  <p>First, we had to learn about how to collect IMDB data. We decided to focus on the filmography of actors that have a movie in the IMDb Top 250 movies list. This is the process we went through:</p>
+  <img src="images/get_IMDB_data.jpg">
+  <p>We stored the list of top 250 movies from the imdb database in a dictionary using the movie ids as keys and the movie titles as values. We then used the movie ids to query the imdb database for the full information about each movie in the top 250 movies. This database call gave us the cast of each of the movies. Many movies have very large casts, so we only used the first 10 cast members in the list. We queried the database for the filmography of each actor / actress, or the list of all the movies they have been in. We then built a redis database, setting the actor / actress’s id as the key and setting the value to a tuple consisting of their name and filmography. We chose to use ids as keys because we wanted to be confident that we were using a unique identifier even if the actors / actresses had the same name.</p>
+
+  <p> The code for getting each actor and their entire filmography into redis can be found here: <a style="color:green" href="https://github.com/skchandra/redis_db/blob/gh-pages/sprint1_usingredis.ipynb">Sprint 1 Version of Data Wrangling</a></p>
+
+<h3>Our Redis Knowledge</h3>
+  <ul>
+    <li>We all read <a href="http://openmymind.net/2011/11/8/Redis-Zero-To-Master-In-30-Minutes-Part-1/">Redis Zero to Master in 30 Minutes Part 1</a></li>
+    <li>Redis is a data structure engine, where a value can only be accessed by a key</li>
+    <li>Can add data structures the same way the 5 that are already there exist</li>
+    <li>All you need is implementation and commands to access it!!!!!!!!!!!</li>
+    <li>Read through and working on implementing example of adding an AVL tree data structure to Redis: <a href="http://www.starkiller.net/2013/05/02/hacking-redis-adding-a-command/">Hacking Redis: Adding a Command</a></li>
+    <li>Need to add commands to access it</li>
+    <li>Implement in separate file, and require it in redis.h</li>
+    <li>Define structure</li>
+    <li>Define management functions</li>
+    <li>Define outward facing commands</li>
+    <li>Actual implementation (graph class in C as described below)</li>
+    <li>Persistence-- RDB and or Append Only File</li>
+  </ul>
+
+<h3>Next Steps</h3>
+  <ul>
+    <li>We plan to create a graph class in C and write methods to implement this data structure in Redis. We are looking into testing both adjacency lists and adjacency matrices to both see which would better suit our needs and increase our overall knowledge. In terms of implementing these features in Redis, we are thinking about either creating a local Redis file with our graph program, or directly contributing to Redis, potentially through hiredis (its C interface).</li>
+    <li>Once we have the graph data structure in Redis, we will create a new database with it in order to be able to traverse through actors/actresses and movies to find connections between them. We decided that it would be easiest to start by instituting Kevin Bacon as the starting point of our graph and creating our version of the Oracle of Bacon.</li>
+    <li>After we have a working implementation for the Bacon Number, we will develop a more general search algorithm which can be applied to search between any two actors/actresses and return the connection between them. Because this is a more broad problem and we are interested in learning more about search algorithms, we will look at depth first search, breadth first search, and bidirectional search in order to be able to see the pros and cons of each.</li>  
+
+<h2>Sprint 2</h2>
+
+<h3> Re-Evaluated Project Steps:</h3>
+
+<p>Coming into sprint 2, we had to re-evaluate our project goals and steps, in order to achieve what we want to learn more efficiently. While we were planning out algorithms and data structures we could use for creating graph/searching. As a result, we scrapped our original idea of using each actor's entire filmography and instead just looked at actors and their films that are in the top 250 movies. <br>
+<ul>Steps we are now doing: 
+<li>Create a dictionary of each top 250 movie as a key, and the top 10 actors for each movie as the corresponding value.</li>
+<li>Use the dictionary to make adjacency lists of each actor and all of the actors that share the same filmography in the top 250 movies list</li>
+<li>Use bi-directional breadth-first search to our adjacency lists to find shortest path between two actors</li>
+</ul>
+</p>
+
+<h2>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
+
+<p>Shivali Chandra (<a href="https://github.com/skchandra" class="user-mention">@skchandra</a>), Cynthia Chen (<a href="https://github.com/yunhsincynthiachen" class="user-mention">@yunhsincynthiachen</a>), Nitya Dhanushkodi (<a href="https://github.com/ndhanushkodi" class="user-mention">@ndhanushkodi</a>) and Marena Richardson (<a href="https://github.com/marenar" class="user-mention">@marenar</a>)</p>
+
+<h3>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+
+<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+      </section>
+      <footer>
+        <span class="site-footer-owner"><a href="https://github.com/skchandra/redis_db">Redis and IMDB Graphs</a> is maintained by <a href="https://github.com/skchandra">skchandra</a>.</span>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
