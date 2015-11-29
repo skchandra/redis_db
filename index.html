@@ -59,20 +59,45 @@
   </ul>
 
 <h3>Next Steps</h3>
+<p>
   <ul>
     <li>We plan to create a graph class in C and write methods to implement this data structure in Redis. We are looking into testing both adjacency lists and adjacency matrices to both see which would better suit our needs and increase our overall knowledge. In terms of implementing these features in Redis, we are thinking about either creating a local Redis file with our graph program, or directly contributing to Redis, potentially through hiredis (its C interface).</li>
     <li>Once we have the graph data structure in Redis, we will create a new database with it in order to be able to traverse through actors/actresses and movies to find connections between them. We decided that it would be easiest to start by instituting Kevin Bacon as the starting point of our graph and creating our version of the Oracle of Bacon.</li>
     <li>After we have a working implementation for the Bacon Number, we will develop a more general search algorithm which can be applied to search between any two actors/actresses and return the connection between them. Because this is a more broad problem and we are interested in learning more about search algorithms, we will look at depth first search, breadth first search, and bidirectional search in order to be able to see the pros and cons of each.</li>  
+  </ul>
+</p>
+
 
 <h2>Sprint 2</h2>
 
-<h3> Re-Evaluated Project Steps:</h3>
+<h3> Re-Evaluated Project Steps</h3>
 
-<p>Coming into sprint 2, we had to re-evaluate our project goals and steps, in order to achieve what we want to learn more efficiently. While we were planning out algorithms and data structures we could use for creating graph/searching. As a result, we scrapped our original idea of using each actor's entire filmography and instead just looked at actors and their films that are in the top 250 movies. <br>
-<ul>Steps we are now doing: 
-<li>Create a dictionary of each top 250 movie as a key, and the top 10 actors for each movie as the corresponding value.</li>
-<li>Use the dictionary to make adjacency lists of each actor and all of the actors that share the same filmography in the top 250 movies list</li>
-<li>Use bi-directional breadth-first search to our adjacency lists to find shortest path between two actors</li>
+  <p>Coming into sprint 2, we had to re-evaluate our project goals and steps, in order to achieve what we want to learn more efficiently. While we were planning out algorithms and data structures we could use for creating graph/searching. As a result, we scrapped our original idea of using each actor's entire filmography and instead just looked at actors and their films that are in the top 250 movies. <br>
+  <ul>Steps we are now doing: 
+  <li>Create a dictionary of each top 250 movie as a key, and the top 10 actors for each movie as the corresponding value.</li>
+  <li>Use the dictionary to make adjacency lists of each actor and all of the actors that share the same filmography in the top 250 movies list</li>
+  <li>Use bi-directional breadth-first search to our adjacency lists to find shortest path between two actors</li>
+  </ul>
+  </p>
+
+<h3>What We Did This Sprint </h3>
+  <p>Code for making the adjacency lists and putting them into Redis: <a href="https://github.com/skchandra/redis_db/blob/gh-pages/Using_Redis.ipynb">Making Adjacency Lists in Redis</a> <br>
+  We also started looking at how to make redis commands.
+  <ul>
+    These are the sources we found: 
+    <li><a href="http://openmymind.net/Writing-A-Custom-Redis-Command-In-C-Part-1/">Writing a Custom Redis Command in C</a></li>
+    <li><a href="http://www.heychinaski.com/blog/2013/10/14/a-look-at-the-redis-source-code/">Looking at the Redis Source Code</a></li>    
+  </ul> <br>
+  Next, we tried making out own Redis commands and replicating the ping pong command in redis. We got a little stuck during this sprint, but will devote all of next sprint to get this working</p>
+
+<h3>Next Steps</h3>
+<p>
+<ul>
+  <li>Now that we have created a data structure and framework to store the actors and their corresponding actors, we are working on integrating these structures into Redis directly. Currently, we are treating each actor as a key and appending each corresponding actor as a value in a list. We are now in the process of figuring out how to add commands into Redis, and once we do that, will be able to add a command to search between two of the actors in our table.
+</li>
+  <li>In terms of searching, we will start out with breadth first search for simplicity and pick one actor/actress to act as the head node. The function we write will allow us to search for the degrees of separation from that particular actor to any other actor.</li>
+  <li>Once we have breadth first search working, we will implement bidirectional search, which is slightly more complicated to setup and code. This will allow us to choose two head nodes (any two actors) and locate the shortest path between them. 
+</li>
 </ul>
 </p>
 
