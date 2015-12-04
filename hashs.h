@@ -150,7 +150,7 @@ char *ht_get( hashtable_t *hashtable, char *key ) {
 
     /* Did we actually find anything? */
     if( pair == NULL || pair->key == NULL || strcmp( key, pair->key ) != 0 ) {
-        return "nothing";
+        return "NULL";
 
     } else {
         return pair->value;

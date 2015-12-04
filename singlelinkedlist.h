@@ -7,14 +7,12 @@
 
 typedef struct node {
     char val[100];
-    int isVisited;
     struct node * next;
 } Node;
 
 Node *make_node(char *val, Node *next) {
     Node *node = malloc(sizeof(Node));
     strcpy(node->val, val);
-    node->isVisited = 0;
     node->next = next;
     return node;
 }
