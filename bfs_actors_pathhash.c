@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
     unsigned int k;
     redisContext *c;
     redisReply *reply;
-    const char *hostname = (argc > 1) ? argv[1] : "127.0.0.1";
-    int port = (argc > 2) ? atoi(argv[2]) : 6379;
+    const char *hostname = (argc > 3) ? argv[3] : "127.0.0.1";
+    int port = (argc > 4) ? atoi(argv[4]) : 6379;
 
     struct timeval timeout = { 1, 500000 }; // 1.5 seconds
     c = redisConnectWithTimeout(hostname, port, timeout);
@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     Node *path;
     hashtable_t *hashtable = ht_create( 65536 );
     hashtable_t *hashtable_parents = ht_create( 65536 );
-    char *start = "0000138";
-    char *end = "0000012";
+    char *start = argv[1];
+    char *end = argv[2];
     
     
     actors = make_node(start, NULL);
@@ -52,7 +52,6 @@ int main(int argc, char **argv) {
                 break; 
             }
             
-            //printf("%s not visited yet\n", name);
             char word_reply[100] = "";
             strcat(word_reply, "LRANGE ");
             strcat(word_reply, name);
@@ -63,16 +62,12 @@ int main(int argc, char **argv) {
                     push(&actors, reply->element[k]->str);
                     char *check2 = ht_get(hashtable_parents, reply->element[k]->str);
                     if (strcmp(check2, "NULL") == 0) {
-                        //printf("child: %s\n", reply->element[k]->str);
-                        //printf("parent: %s\n", name);
                         ht_set(hashtable_parents, reply->element[k]->str, name);
                     }
                 }
             }
             
             ht_set(hashtable, name, "visited");
-        } else {
-            //printf("%s already visited\n", name);
         }
         pop(&actors);
     }
@@ -88,11 +83,9 @@ int main(int argc, char **argv) {
     reverse(&final_path);
     print_list(final_path);
     
-    // print_list(actors);
-    // printf("%i\n", count);
-    
     /* Disconnects and frees the context */
     redisFree(c);
 
     return 0;
 }
+
