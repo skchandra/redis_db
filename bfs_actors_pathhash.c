@@ -35,18 +35,20 @@ int main(int argc, char **argv) {
     Node *path;
     hashtable_t *hashtable = ht_create( 65536 );
     hashtable_t *hashtable_parents = ht_create( 65536 );
+    char *start = "0000138";
+    char *end = "0000012";
     
     
-    actors = make_node("0000138", NULL);
-    char *name = "0000138";
+    actors = make_node(start, NULL);
+    char *name = start;
     
-    while (strcmp(name, "0000012") != 0) {
+    while (strcmp(name, end) != 0) {
         name = peek(&actors);
 
         char *check = ht_get(hashtable, name);
 
         if(strcmp(check, "NULL")==0){
-            if (strcmp(name, "0000012") == 0) { 
+            if (strcmp(name, end) == 0) { 
                 break; 
             }
             
@@ -76,12 +78,13 @@ int main(int argc, char **argv) {
     }
     printf("%s", "success\n");
 
-    char *parent = ht_get(hashtable_parents, "0000012");
-    Node *final_path = make_node("0000012", NULL);
-    while (strcmp(parent, "0000138") != 0) {
-        parent = ht_get(hashtable_parents, parent);
+    char *parent = ht_get(hashtable_parents, end);
+    Node *final_path = make_node(end, NULL);
+    while (strcmp(parent, start) != 0) {
         push(&final_path, parent);
+        parent = ht_get(hashtable_parents, parent);
     }
+    push(&final_path, parent);
     reverse(&final_path);
     print_list(final_path);
     
@@ -93,4 +96,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
