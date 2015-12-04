@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <assert.h>
+#include "singlelinkedlist.h"
 #include "hiredis.h"
-
+  
 int main(int argc, char **argv) {
+    
     unsigned int j;
     unsigned int k;
     redisContext *c;
@@ -42,9 +44,50 @@ int main(int argc, char **argv) {
     /* Try a GET and two INCR */
     redisReply *all_keys;
     all_keys = redisCommand(c, "KEYS *");
-    if (all_keys->type == REDIS_REPLY_ARRAY) {
+    
+    Node *actors;
+    Node *path;
+    
+    int count = 1;
+    
+    actors = make_node("0000138", NULL);
+    char *name = "0000138";
+    
+    while (strcmp(name, "0356017") != 0) {
+      name = peek(&actors);
+      printf("%s %i\n", name, actors->isVisited);
+      if (actors->isVisited != 1) {
+      if (strcmp(name, "0356017") == 0) { 
+        return; 
+      }
+      printf("%s %i\n", name, actors->isVisited);
+      char word_reply[100] = "";
+      strcat(word_reply, "LRANGE ");
+      strcat(word_reply, name);
+      strcat(word_reply, " 0 -1");
+      reply = redisCommand(c,word_reply);
+      if (reply->type == REDIS_REPLY_ARRAY) {
+        for (k = 0; k < reply->elements; k++) {
+          push(&actors, reply->element[k]->str);
+        }
+      }
+      actors->isVisited = 1;
+    } else {
+      printf("visited %s %i\n", name, actors->isVisited);
+    }
+    pop(&actors);
+  }
+  printf("%s", "success");
+    /*if (all_keys->type == REDIS_REPLY_ARRAY) {
         for (j = 0; j < all_keys->elements; j++) {
-            printf("%u) %s\n", j, all_keys->element[j]->str);
+      if (j == 0) {
+        actors = make_node(all_keys->element[j]->str, NULL);
+      } else {
+        push(&actors, all_keys->element[j]->str);
+        count = count+1;
+      }
+      
+            //printf("%u) %s\n", j, all_keys->element[j]->str);
             char word_reply[100] = "";
             strcat(word_reply, "LRANGE ");
             strcat(word_reply, all_keys->element[j]->str);
@@ -52,43 +95,29 @@ int main(int argc, char **argv) {
             reply = redisCommand(c,word_reply);
             if (reply->type == REDIS_REPLY_ARRAY) {
                 for (k = 0; k < reply->elements; k++) {
-                    printf("%u) %s\n", k, reply->element[k]->str);
+                    push(&actors, reply->element[k]->str);
+                    count = count+1;
                 }
             }
             freeReplyObject(reply);
         }
     }
-    freeReplyObject(all_keys);
+    freeReplyObject(all_keys);*/
 
-
-    // reply = redisCommand(c,"INCR counter");
-    // printf("INCR counter: %lld\n", reply->integer);
-    // freeReplyObject(reply);
-    // /* again ... */
-    // reply = redisCommand(c,"INCR counter");
-    // printf("INCR counter: %lld\n", reply->integer);
-    // freeReplyObject(reply);
-
-    // /* Create a list of numbers, from 0 to 9 */
-    // reply = redisCommand(c,"DEL mylist");
-    // freeReplyObject(reply);
-    // for (j = 0; j < 10; j++) {
-    //     char buf[64];
-
-    //     snprintf(buf,64,"%u",j);
-    //     reply = redisCommand(c,"LPUSH mylist element-%s", buf);
-    //     freeReplyObject(reply);
-    // }
-
-    // /* Let's check what we have inside the list */
-    // reply = redisCommand(c,"LRANGE mylist 0 -1");
-    // if (reply->type == REDIS_REPLY_ARRAY) {
-    //     for (j = 0; j < reply->elements; j++) {
-    //         printf("%u) %s\n", j, reply->element[j]->str);
-    //     }
-    // }
-    // freeReplyObject(reply);
-
+  // make a list of even numbers
+    /*Node *test_list = make_node("2", NULL);
+    test_list->next = make_node("4", NULL);
+    test_list->next->next = make_node("6", NULL);
+    
+    print_list(test_list);
+    char *val = pop(&test_list);
+    print_list(test_list);
+    push(&test_list, "3");
+    print_list(test_list);*/
+    
+    print_list(actors);
+    printf("%i\n", count);
+    
     /* Disconnects and frees the context */
     redisFree(c);
 
