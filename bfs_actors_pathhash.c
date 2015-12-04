@@ -52,7 +52,6 @@ int main(int argc, char **argv) {
                 break; 
             }
             
-            //printf("%s not visited yet\n", name);
             char word_reply[100] = "";
             strcat(word_reply, "LRANGE ");
             strcat(word_reply, name);
@@ -63,16 +62,12 @@ int main(int argc, char **argv) {
                     push(&actors, reply->element[k]->str);
                     char *check2 = ht_get(hashtable_parents, reply->element[k]->str);
                     if (strcmp(check2, "NULL") == 0) {
-                        //printf("child: %s\n", reply->element[k]->str);
-                        //printf("parent: %s\n", name);
                         ht_set(hashtable_parents, reply->element[k]->str, name);
                     }
                 }
             }
             
             ht_set(hashtable, name, "visited");
-        } else {
-            //printf("%s already visited\n", name);
         }
         pop(&actors);
     }
@@ -88,11 +83,9 @@ int main(int argc, char **argv) {
     reverse(&final_path);
     print_list(final_path);
     
-    // print_list(actors);
-    // printf("%i\n", count);
-    
     /* Disconnects and frees the context */
     redisFree(c);
 
     return 0;
 }
+
