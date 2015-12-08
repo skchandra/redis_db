@@ -1,5 +1,5 @@
 # graph is in adjacent list representation
-graph = {
+graph = {   
         '1': ['2', '3', '4'],
         '2': ['5', '6'],
         '5': ['9', '10'],
