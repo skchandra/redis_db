@@ -130,7 +130,24 @@ def bfs(graph, start, end):
 <h3>Breadth-First Search in C</h3>
 <h3>Bi-Directional Search in C</h3>
 <h3>Working More with Multiple Redis Databases</h3>
-  <p>Once we had breadth-first search working, we wanted to be able to have actual actor names, instead of just actual actor ids.</p>
+  <p>Once we had breadth-first search working, we wanted to be able to have actual actor names, instead of just actual actor ids. At the same time, we wanted to be able to implement that into the redis command, and have it done in C.
+  <ul>Steps For Having Actor Names Implemented:
+  <li>Get Key-Value File System in redis server with actor name as key, and actor id as value. This is for taking in an actor name first, converting it into id's, which is how our adjacency list is comprised of.</li>
+  <li>Get Key-Value File System in redis server with actor id as key, and actor name as value. This is for getting the final display of the degrees of separation path.</li>
+  <li>Write code for switching between 3 different databases to do the three different parts of the algorithm: 1. Get actor names from argument of command, and use name-to-id lookup table to get the start and end id's. 2. Do search algorithm with the actor id's. 3. Use the id-to-name lookup table to print out the path from start to end.</li>
+  </ul>
+  Using Python, we store all of the two lookup tables into the redis servers, and then use the switch command to access the other databases. Here is an example of the switch command: 
+    <pre>
+    
+      //SETTING UP LOOKUP TABLE:
+      redisReply *actors_ids;
+      actors_ids = redisCommand(c, "SELECT 2");
+
+      redisReply *switch_back;
+      switch_back = redisCommand(c, "SELECT 0");
+    </pre>
+  We have to do this each time that we want to use different databases.
+  </p>
 
 <h2>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
