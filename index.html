@@ -215,6 +215,46 @@ while (strcmp(name, end) != 0) {
 }
   </pre>
 
+    <p>Using the parents hashtable, we were able to build up the path from the source actor to the destination actor as follows: </p>
+  <pre>
+        /*
+            BUILDING UP THE PATH FROM THE PARENT HASHTABLE
+        */
+
+        //Gets first parent to make linked list
+        //To trace back and print the path
+        //parent is an id in hashtable_parents
+        char *parent = ht_get(hashtable_parents, end);
+
+        //Use parent hashtable to build up path
+        //all the way up to but not including the final parent
+        while (strcmp(parent, start) != 0) {
+            //Need to store in redis reply after looking
+            //up the actual name from id stored in parent
+            redisReply *actor_name;
+
+            //Get the actor name
+            actor_name = redisCommand(c,"GET %s", parent);
+            char *parent_name = actor_name->str;
+
+            //push parent name to build up final path
+            push(&final_path, parent_name);
+            //get new parent
+            parent = ht_get(hashtable_parents, parent);
+        }
+
+        //Get the final parent, the last name that needs
+        //to get pushed onto the path
+        redisReply *actor_name;
+        actor_name = redisCommand(c,"GET %s", parent);
+        char *parent_name = actor_name->str;
+
+        push(&final_path, parent_name);
+
+        reverse(&final_path);
+        print_list(final_path);
+  </pre>
+
 <h3>Bidirectional Search in C</h3>
 <p> Bidirectional breadth first search is very similar to regular breadth first search, with just a few modifications. The primary change we made was to create two separate queues to iterate through: one for nodes visited branching from the starting actor, and one for nodes visited branching from the ending actor. For both queues, the head node goes through the same process as in breadth first search - checking to make sure it has not been visited, checking and adding its children nodes, and adding it to the hashtable of visited actors. Before popping these head nodes from the queues, they are compared to see if they are equal (meaning they are the same person). If they are equal, a complete path from the start and end actors has been found, and the program moves onto the next step. </p>
 <p> This is where the path is generated and printed out. We use the same method of storing the parent node of each node in two hashtables, one for the start and one for the end queue. In order to get the paths, we simply add each parent node to a linked list until the start or end actor has been found. Once that occurs, we are left with two lists, the path from the start to the meeting actor, and the path from the end to the meeting actor. Finally, we reverse the first list in order to join the two lists. </p> 
