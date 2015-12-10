@@ -101,6 +101,30 @@
 </ul>
 </p>
 
+<h2> Sprint 3</h2>
+<h3>Breadth-First Search in Python</h3>
+<p> We spent a lot of time this sprint not looking further at storing data, but understanding data structures and search algorithms. We created our own working breadth-first search algorithm, and made sure it worked with our data in redis.</p>
+<pre>
+def bfs(graph, start, end):
+    # maintain a queue of paths
+    queue = []
+    # push the first path into the queue
+    queue.append([start])
+    while queue:
+        # get the first path from the queue
+        path = queue.pop(0)
+        # get the last node from the path
+        node = path[-1]
+        # path found
+        if node == end:
+            return path
+        # enumerate all adjacent nodes, construct a new path and push it into the queue
+        for adjacent in graph.get(node, []):
+            new_path = list(path)
+            new_path.append(adjacent)
+            queue.append(new_path)
+</pre>
+
 <h2>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
 
