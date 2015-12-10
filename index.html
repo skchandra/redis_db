@@ -258,6 +258,7 @@ while (strcmp(name, end) != 0) {
 <h3>Bidirectional Search in C</h3>
 <p> Bidirectional breadth first search is very similar to regular breadth first search, with just a few modifications. The primary change we made was to create two separate queues to iterate through: one for nodes visited branching from the starting actor, and one for nodes visited branching from the ending actor. For both queues, the head node goes through the same process as in breadth first search - checking to make sure it has not been visited, checking and adding its children nodes, and adding it to the hashtable of visited actors. Before popping these head nodes from the queues, they are compared to see if they are equal (meaning they are the same person). If they are equal, a complete path from the start and end actors has been found, and the program moves onto the next step. </p>
 <p> This is where the path is generated and printed out. We use the same method of storing the parent node of each node in two hashtables, one for the start and one for the end queue. In order to get the paths, we simply add each parent node to a linked list until the start or end actor has been found. Once that occurs, we are left with two lists, the path from the start to the meeting actor, and the path from the end to the meeting actor. Finally, we reverse the first list in order to join the two lists. </p> 
+
 <h3>Working More with Multiple Redis Databases</h3>
   <p>Once we had breadth-first search working, we wanted to be able to have actual actor names, instead of just actual actor ids. At the same time, we wanted to be able to implement that into the redis command, and have it done in C.
   <ul>Steps For Having Actor Names Implemented:
@@ -278,7 +279,11 @@ while (strcmp(name, end) != 0) {
   We have to do this each time that we want to use different databases.
   </p>
 
-
+<h3>Problems we faced</h3>
+<p>
+  When creating both the breadth-first search and bidirectional search algorithms, we encountered a few problems along the way. We had a difficult time retracing the path in both cases. Initially, we were going to store the path that it took to get to each node in a linked list on the node itself. Then we came up with the parent hashtable idea, which we liked better as a solution. We had a bug where the second to last node in the path was not being displayed because of the order we were pushing things to the path and looking them up in the parent hashtable. We fixed this through careful examination of the logic flow, and used the same type of debugging for the bugs we found in bidirectional search. </p>
+  <p>In bidirectional search, we encountered a problem with the while loop that handled popping nodes off of the queues. The while loop would check whether the start node and end nodes were equal to each other, and execute if they weren’t. At the end of the loop, the current heads of the start queue and end queue would be popped. When it got to the two actors / actresses that were equal, the meet in the middle point for bidirectional search, the while loop would never execute or set the value of the start and end. Because the while loop wasn’t running, we weren’t able to access those values. We knew that the path met, but not at which value. To fix this issue, we changed the while loop so it continued until the start and end queues were empty and we put in a check at the end of the while loop. If the two actors were equal, break, otherwise pop them off their queues and continue. 
+  </p>
 <h2>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
 
