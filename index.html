@@ -126,9 +126,98 @@ def bfs(graph, start, end):
 </pre>
 
 <h2>Sprint 4</h2>
+
 <h3>Sprint Goals</h3>
+<h3>Sprint Goals</h3>
+<p>For this sprint, we had really cemented the algorithm and steps to attaining the desired result. We were first going to implement breadth-first search in C, using linked lists and hashtables, and then, if time permitted, implement bi-directional breadth-first search. We also wanted to use real actor names, instead of id’s in the interface portion of the redis command. This sprint really cemented our learning of C, in terms of data structures, and our ability to utilize redis commands through hiredis.</p> 
+
 <h3>Breadth-First Search in C</h3>
-<h3>Bi-Directional Search in C</h3>
+  <p>To complete breadth first search in C, we had to create a hashtable data structure and a linked list data structure to be able to implement the algorithm in a manner similar to the python code described above. The linked list was used as a queue, and the hashtable served 2 purposes. It was used to keep track of the visited actors in the adjacency list during the breadth first search, and to make up a child:parent hashtable.</p>
+  <p>For the linked list data structure, we all had practice implementing this data structure in an earlier sprint exercise, so we felt comfortable just taking this structure and using it. We made some modifications in order to allow it to act like a FIFO data structure queue by changing the push method to push nodes to the end of the linked list rather than the beginning. The pop method pops a node from the beginning, giving queue functionality. This linked list is imported from a file we made called singlelinkedlist.h. </p>  
+
+  <p>For the hashtable data structure, we had all also implemented a hashtable data structure, but needed one with keys and values being strings, or in other words, char*. So we found an implementation online to use. This is stored in a file hashs.h. </p>
+
+  <p>The traversal of the graph using breadth first search to create the child:parent hashtable is commented and annotated and shown below. Start with a current node "name". Make a query for all of the current node's neighbors. A queue of actors is used to store each neighbor  for the current actor node that we are visiting. We then add each neighbor, and it's parent (the current node) to a hashtable of child:parent. Then mark the current node as visited. </p>
+  <pre>
+/* 
+    BREADTH FIRST SEARCH IMPLEMENTATION
+*/
+
+//Switch back to DB0 for breadth-first search
+redisReply *switch_back;
+switch_back = redisCommand(c, "SELECT 0");
+
+//initialize LLs and hashtables
+Node *actors; //used in BFS as the Queue
+Node *path; //used later for building the path
+
+//visited hashtable
+hashtable_t *hashtable = ht_create( 65536 );
+
+//hashtable of parents to build path later
+hashtable_t *hashtable_parents = ht_create( 65536 );
+
+//initialize the start node for the actors Queue
+actors = make_node(start, NULL);
+char *name = start;
+
+//while the start and end are not equal
+while (strcmp(name, end) != 0) {
+    name = peek(&actors);
+
+    //check-- has name been visited?
+    char *check = ht_get(hashtable, name);
+
+    //if name is unvisited
+    if(strcmp(check, "NULL")==0){
+
+        //break out if you have reached
+        //finishing condition
+        if (strcmp(name, end) == 0) { 
+            break; 
+        }
+        
+        //continue BFS
+        //set up the query for the list of actors
+        //in the adjacency list (neighbors)
+        char word_reply[100] = "";
+        strcat(word_reply, "LRANGE ");
+        strcat(word_reply, name);
+        strcat(word_reply, " 0 -1");
+        //store the query response
+        reply = redisCommand(c,word_reply);
+        if (reply->type == REDIS_REPLY_ARRAY) {
+            for (k = 0; k < reply->elements; k++) {
+                //push each neighbor onto the queue (as you
+                //do in BFS)
+                push(&actors, reply->element[k]->str);
+                //check if each neighbor is in the hashtable
+                //of parents
+                char *check2 = ht_get(hashtable_parents, reply->element[k]->str);
+                if (strcmp(check2, "NULL") == 0) {
+                    //if not, then put that neighbor and it's parent, name
+                    //in the hashtable. It is keeping it traceable
+                    //by the path later. 
+                    ht_set(hashtable_parents, reply->element[k]->str, name);
+                }
+            }
+        }
+        //once done, set name to visited
+        //recall that name is just the current node
+        //we are visiting.
+        ht_set(hashtable, name, "visited");
+    }
+    //traversing graph by popping from actors
+    //then the new current node, name, will be set to 
+    //the beginning of actors again at the beginning of the
+    //while loop.
+    pop(&actors);
+}
+  </pre>
+
+<h3>Bidirectional Search in C</h3>
+<p> Bidirectional breadth first search is very similar to regular breadth first search, with just a few modifications. The primary change we made was to create two separate queues to iterate through: one for nodes visited branching from the starting actor, and one for nodes visited branching from the ending actor. For both queues, the head node goes through the same process as in breadth first search - checking to make sure it has not been visited, checking and adding its children nodes, and adding it to the hashtable of visited actors. Before popping these head nodes from the queues, they are compared to see if they are equal (meaning they are the same person). If they are equal, a complete path from the start and end actors has been found, and the program moves onto the next step. </p>
+<p> This is where the path is generated and printed out. We use the same method of storing the parent node of each node in two hashtables, one for the start and one for the end queue. In order to get the paths, we simply add each parent node to a linked list until the start or end actor has been found. Once that occurs, we are left with two lists, the path from the start to the meeting actor, and the path from the end to the meeting actor. Finally, we reverse the first list in order to join the two lists. </p> 
 <h3>Working More with Multiple Redis Databases</h3>
   <p>Once we had breadth-first search working, we wanted to be able to have actual actor names, instead of just actual actor ids. At the same time, we wanted to be able to implement that into the redis command, and have it done in C.
   <ul>Steps For Having Actor Names Implemented:
@@ -148,6 +237,7 @@ def bfs(graph, start, end):
     </pre>
   We have to do this each time that we want to use different databases.
   </p>
+
 
 <h2>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h2>
