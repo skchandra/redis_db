@@ -33,13 +33,13 @@ int main(int argc, char **argv) {
     Node *start_queue;
     Node *end_queue;
     hashtable_t *hashtable_start = ht_create( 65536 );
-    hashtable_t *hashtable_end = ht_create( 65536 );
+    //hashtable_t *hashtable_end = ht_create( 65536 );
     hashtable_t *hashtable_parents = ht_create( 65536 );
     hashtable_t *hashtable_parents_end = ht_create( 65536 );
     /*char *start = argv[1];
     char *end = argv[2];*/
-    char *start = "0000147";
-    char *end = "0000012";
+    char *start = "0000138";
+    char *end = "0000197";
     
     start_queue = make_node(start, NULL);
     end_queue = make_node(end, NULL);
@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
 		push(&path_to_meet_e, end_name);
 		
 		char *check_start = ht_get(hashtable_start, start_name);
-        char *check_end = ht_get(hashtable_end, end_name);
+		char *check_end = ht_get(hashtable_start, end_name);
+        //char *check_end = ht_get(hashtable_end, end_name);
 		
 		if(strcmp(check_start, "NULL")==0){	
 			if (strcmp(end_name, start_name) == 0) {
@@ -101,14 +102,14 @@ int main(int argc, char **argv) {
 			if (reply->type == REDIS_REPLY_ARRAY) {
 				for (k = 0; k < reply->elements; k++) {
 					push(&end_queue, reply->element[k]->str);
-					char *check2_en = ht_get(hashtable_parents, reply->element[k]->str);
+					char *check2_en = ht_get(hashtable_parents_end, reply->element[k]->str);
 					if (strcmp(check2_en, "NULL") == 0) {
-						ht_set(hashtable_parents, reply->element[k]->str, end_name);
+						ht_set(hashtable_parents_end, reply->element[k]->str, end_name);
 					}
 				}
 			}
-			
-			ht_set(hashtable_end, end_name, "visited");
+			ht_set(hashtable_start, end_name, "visited");
+			//ht_set(hashtable_end, end_name, "visited");
 		}
 		
 		if (strcmp(start_name, end_name) != 0) {
@@ -121,21 +122,33 @@ int main(int argc, char **argv) {
         pop(&path_to_meet_s);
         pop(&path_to_meet_e);
     }
+    char *start_parent = peek(&path_to_meet_s);
+    char *end_parent = peek(&path_to_meet_e);
     printf("%s", "success\n");
-    print_list(path_to_meet_s);
+    /*print_list(path_to_meet_s);
     printf("\n");
-    print_list(path_to_meet_e);
+    print_list(path_to_meet_e);*/
 
-/*    char *parent = ht_get(hashtable_parents, end);
-    Node *final_path = make_node(end, NULL);
-    while (strcmp(parent, start) != 0) {
-        push(&final_path, parent);
-        parent = ht_get(hashtable_parents, parent);
-    }
-    push(&final_path, parent);
-    reverse(&final_path);
-    print_list(final_path);
-    */
+	reverse(&path_to_meet_s);
+	pop(&path_to_meet_s);
+	reverse(&path_to_meet_e);
+	
+	char *parent_st = ht_get(hashtable_parents, start_parent);
+	char *parent_en = ht_get(hashtable_parents_end, end_parent);
+	while (strcmp(parent_st, start) != 0) {
+		push(&path_to_meet_s, parent_st);
+		parent_st = ht_get(hashtable_parents, parent_st);
+	}
+	while (strcmp(parent_en, end) != 0) {
+		push(&path_to_meet_e, parent_en);
+		parent_en = ht_get(hashtable_parents_end, parent_en);
+	}
+	push(&path_to_meet_s, parent_st);
+	reverse(&path_to_meet_s);
+	push(&path_to_meet_e, parent_en);
+	//print_list(path_to_meet_s);
+	print_list(path_to_meet_e);
+		
     /* Disconnects and frees the context */
     redisFree(c);
 
