@@ -105,6 +105,8 @@ int main(int argc, char **argv) {
 
     Node *final_path = make_node(first_parent_name, NULL);
 
+
+
     //Gets first parent to make linked list
     char *parent = ht_get(hashtable_parents, end);
 
@@ -114,6 +116,7 @@ int main(int argc, char **argv) {
         //Get the actor name
         actor_name = redisCommand(c,"GET %s", parent);
         char *parent_name = actor_name->str;
+
         //push parent name
         push(&final_path, parent_name);
         //get new parent
