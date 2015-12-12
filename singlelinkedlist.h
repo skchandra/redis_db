@@ -47,6 +47,11 @@ char *peek(Node **head) {
 }
 
 // Add a new element to the beginning of the list.
+void push_begin(Node **head, char *val) {
+    Node *new_node = make_node(val, *head);
+    *head = new_node;
+}
+
 void push(Node **head, char *val) {
     Node *new_node = make_node(val, NULL);
     //*head = new_node;
